@@ -4,7 +4,7 @@ import time
 import requests
 
 def build_dns_query(domain_name):
-    # Constructs a raw DNS query packet. 
+    # Constructs a raw DNS query packet
     transaction_id = 1234  
     flags = 0x0100  
     qdcount = 1  
@@ -30,7 +30,7 @@ def build_dns_query(domain_name):
     return header + question
 
 def send_dns_req(domain_name, dns_server, port=53, use_tcp=False):
-    # Sends a DNS request using either UDP or TCP and receives the response. 
+    # Sends a DNS request using either UDP or TCP and receives the response
     query = build_dns_query(domain_name)
     print(f"Sending DNS request to {dns_server} for {domain_name} (TCP: {use_tcp})")
 
@@ -67,7 +67,7 @@ def send_dns_req(domain_name, dns_server, port=53, use_tcp=False):
     return response, rtt
 
 def parse_compressed_name(response, offset):
-    # Parses a compressed or non-compressed domain name from a DNS response. 
+    # Parses a compressed or non-compressed domain name from a DNS response
     labels = []
     jumped = False
     initial_offset = offset
@@ -97,14 +97,14 @@ def parse_compressed_name(response, offset):
     return ".".join(labels), (initial_offset if jumped else offset)
 
 def extract_ns_from_section(response, section_offset):
-    # Extracts NS records from the DNS response section. 
+    # Extracts NS records from the DNS response section
     offset = response.index(b"\x00") + section_offset  
     rdlength = struct.unpack("!H", response[offset:offset+2])[0]
     offset += 2
     return response[offset:offset+rdlength].decode(errors='ignore')
 
 def extract_authoritative_ns(response):
-    # Extracts the Authoritative Name Server (NS) from the Authority section. 
+    # Extracts the Authoritative Name Server (NS) from the Authority section
     authority_count = struct.unpack("!H", response[8:10])[0]
     print(f"Authority section count: {authority_count}")
 
@@ -132,7 +132,7 @@ def extract_authoritative_ns(response):
     return None
 
 def extract_ns_ip(response):
-    # Extracts NS IP from the Additional section. 
+    # Extracts NS IP from the Additional section
     additional_count = struct.unpack("!H", response[10:12])[0]
 
     if additional_count == 0:
@@ -158,7 +158,7 @@ def extract_ns_ip(response):
     return None
 
 def parse_dns_response(response):
-    # Extracts the first A (IPv4), AAAA (IPv6), or CNAME from a DNS response. 
+    # Extracts the first A (IPv4), AAAA (IPv6), or CNAME from a DNS response
     if not response:
         print("No response received.")
         return None
@@ -244,7 +244,7 @@ def parse_dns_response(response):
     return None
 
 def recursive_dns_resolution(domain):
-    # Performs full recursive DNS resolution by querying root, TLD, and authoritative DNS servers.
+    # Performs full recursive DNS resolution by querying root, TLD, and authoritative DNS servers
     print(f"Resolving {domain} using full recursive DNS resolution...")
     root_servers = [
         "170.247.170.2",  # b.root-servers.net
@@ -264,7 +264,7 @@ def recursive_dns_resolution(domain):
                 print(f"Extracted TLD NS: {tld_ns}")
             if tld_ip:
                 print(f"Extracted TLD Name Server IP: {tld_ip}")
-                # Found a valid TLD server, move to the next step.
+                # Found a valid TLD server, move to the next step
                 break  
 
     if not tld_ip:
@@ -302,7 +302,7 @@ def recursive_dns_resolution(domain):
     return parse_dns_response(response)
 
 def extract_tld_ns(response):
-    # Extract the TLD Name Server (NS) from the authority section.
+    # Extract the TLD Name Server (NS) from the authority section
     # Get the Authority section count
     authority_count = struct.unpack("!H", response[8:10])[0]  
     print(f"Authority section count: {authority_count}")
@@ -347,7 +347,7 @@ def extract_tld_ns(response):
     return None
 
 def resolve_ns_ip_manually(ns_name):
-    # Uses Python's socket API to resolve the IP address of a Name Server.
+    # Uses Python's socket API to resolve the IP address of a Name Server
     try:
         ns_ip = socket.gethostbyname(ns_name)
         print(f"Resolved {ns_name} manually to {ns_ip}")
@@ -357,7 +357,7 @@ def resolve_ns_ip_manually(ns_name):
         return None
 
 def measure_http_rtt(ip_address):
-    # Measures the RTT for an HTTP request to wikipedia.org using the resolved IP.
+    # Measures the RTT for an HTTP request to wikipedia.org using the resolved IP
     if not ip_address:
         print("Error: No valid IP address resolved. Cannot make HTTP request.")
         return None
