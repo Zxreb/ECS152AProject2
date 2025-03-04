@@ -35,23 +35,23 @@ def send_dns_req(domain_name, dns_server, port=53, use_tcp=False):
     print(f"Sending DNS request to {dns_server} for {domain_name} (TCP: {use_tcp})")
 
     if use_tcp:
-        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        sock.settimeout(10)
-        sock.connect((dns_server, port))
+        sk = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        sk.settimeout(10)
+        sk.connect((dns_server, port))
         # Prefix length for TCP
-        sock.sendall(struct.pack("!H", len(query)) + query)  
-        response = sock.recv(1024)  
-        sock.close()
+        sk.sendall(struct.pack("!H", len(query)) + query)  
+        response = sk.recv(1024)  
+        sk.close()
         # Skip the first 2 bytes (length prefix)
         return response[2:], None  
 
-    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    sock.settimeout(10)
+    sk = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    sk.settimeout(10)
     start_time = time.time()
-    sock.sendto(query, (dns_server, port))
+    sk.sendto(query, (dns_server, port))
 
     try:
-        response, _ = sock.recvfrom(512)
+        response, _ = sk.recvfrom(512)
         rtt = (time.time() - start_time) * 1000
         print(f"Received response from {dns_server} in {rtt:.2f} ms")
         
@@ -63,7 +63,7 @@ def send_dns_req(domain_name, dns_server, port=53, use_tcp=False):
         print(f"Request to {dns_server} timed out.")
         return None, None
 
-    sock.close()
+    sk.close()
     return response, rtt
 
 def parse_compressed_name(response, offset):
