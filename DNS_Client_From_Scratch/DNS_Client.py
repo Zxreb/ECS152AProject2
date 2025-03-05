@@ -397,4 +397,4 @@ if __name__ == "__main__":
         # Measure HTTP RTT
         http_rtt = measure_http_rtt(ip_address)
     else:
-        print(f"Failed to resolve {domain}.")
+        print(f"Failed to resolve {domain}.") 
